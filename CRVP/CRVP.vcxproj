@@ -69,6 +69,7 @@
   <ItemGroup>
     <ClInclude Include="chromosome.h" />
     <ClInclude Include="cvrp.h" />
+    <ClInclude Include="helpers.h" />
     <ClInclude Include="tsp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

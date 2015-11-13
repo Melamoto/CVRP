@@ -8,7 +8,7 @@
 #include "tsp.h"
 
 using namespace std;
-using namespace crvp;
+using namespace tsp;
 
 struct geneticParameters{
     int maxGenerations;
@@ -19,11 +19,11 @@ struct geneticParameters{
 };
 
 const geneticParameters defaultGeneticParams = {
-    100,
-    1000,
-    300,
-    0.05,
-    0.7
+    10000,
+    50000,
+    15000,
+    1.15,
+    0.85
 };
 
 // Selects a weighted random sample of size 'breederCount' from 'population', using a (pre-seeded) 'rng'
@@ -53,7 +53,7 @@ vector<chromosome> selection(vector<chromosome>& population, unsigned breederCou
     return breeders;
 }
 
-chromosome evolveSolution(problemParameters problem, geneticParameters gen, default_random_engine& rng)
+chromosome evolveSolution(shared_ptr<problemParameters>& problem, geneticParameters& gen, default_random_engine& rng)
 {
     vector<chromosome> population = initialPopulation(problem, gen.populationSize, rng);
     chromosome bestSolution = population[0];
@@ -62,17 +62,24 @@ chromosome evolveSolution(problemParameters problem, geneticParameters gen, defa
     }
     uniform_real_distribution<double> percent(0.0, 1.0);
     for (int it = 0; it < gen.maxGenerations; ++it){
+        if (it % 100 == 0) cout << it << endl;
         // Selection
         vector<chromosome> breeders = selection(population, gen.breederCount, rng);
         // Crossover
         population.empty();
         while (population.size() < gen.populationSize){
             vector<chromosome> parents;
-            for (int p = 0; p < parentsPerCrossover; ++p){
-                parents.push_back(breeders[rng() % breeders.size()]);
+            vector<size_t> parentIndices;
+            while (parents.size() < parentsPerCrossover){
+                size_t nextParent = rng() % breeders.size();
+                if (find(parentIndices.begin(), parentIndices.end(), nextParent) != parentIndices.end()) continue;
+                parentIndices.push_back(nextParent);
             }
-            vector<chromosome> children = crossover(parents, gen.crossoverRate, rng);
-            population.insert(population.end(), children.begin(), children.end());
+            for (auto index : parentIndices) parents.push_back(breeders[index]);
+            //vector<chromosome> children = crossover(parents, gen.crossoverRate, rng);
+            //population.insert(population.end(), children.begin(), children.end());
+            chromosome child = edgeCrossover(parents, gen.crossoverRate, rng);
+            population.push_back(child);
         }
         // Mutation & find best solution
         for (auto ch : population){
@@ -86,16 +93,20 @@ chromosome evolveSolution(problemParameters problem, geneticParameters gen, defa
 }
 
 int main(int argc, char** argv){
-    if (argc != 3){
+    if (argc != 2){
         cout << "Invalid argument count." << endl;
         return 0;
     }
     string filename(argv[1]);
-    int maxIterations = stoi(string(argv[2]));
     double mutationRate = 0.1;
-    problemParameters problem = getParameters(filename);
+    shared_ptr<problemParameters> problem(new problemParameters(getParameters(filename)));
     geneticParameters gen = defaultGeneticParams;
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     default_random_engine rng(seed);
     chromosome solution = evolveSolution(problem, gen, rng);
+    for (auto node : solution.nodes) cout << node << " ";
+    cout << endl;
+    cout << solution.getFitness() << endl;
+    cin.get();
+    return 0;
 }
