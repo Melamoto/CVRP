@@ -4,6 +4,7 @@
 #include <string>
 #include <random>
 #include <chrono>
+#include <stdexcept>
 #include "cvrp.h"
 #include "tabu.h"
 
@@ -23,7 +24,11 @@ int main(int argc, char** argv){
     rng = default_random_engine(seed);
     vector<saving> savings = calculateSavings(problem.nodes);
     solution solution = calculateClarkeWrightSolution(problem.nodes, savings, problem.capacity);
-    solution.printSolution(cout);
-    cin.get();
+    std::ofstream outFile("best-solution.txt", std::ofstream::out);
+    if (!outFile) throw runtime_error("wtf");
+    outFile << "login sl12754 58774" << '\n';
+    outFile << "name Stephen Tozer" << '\n';
+    outFile << "algorithm Tabu Search with savings heuristic" << '\n';
+    solution.printSolution(outFile);
     return 0;
 }

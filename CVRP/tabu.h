@@ -20,25 +20,30 @@ solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving>
     //   'savings' only contains savings for nodes that can be "attached" to other routes,
     //   i.e. are the first or last node visited by their respective vehicle
     //   'result' is a valid solution
+    int iter = 0;
     while (nodesMatched){
         nodesMatched = false;
-        for (int s = savings.size() - 1; s >= 0; s++){
+        for (int s = savings.size() - 1; s >= 0; s--){
             uint16_t nodeA = savings[s].nodeA;
             uint16_t nodeB = savings[s].nodeB;
             auto vehicleA = result.containingVehicle(nodeA);
             auto vehicleB = result.containingVehicle(nodeB);
             uint16_t totalCapacity = vehicleA->usedCapacity() + vehicleB->usedCapacity();
             // Merge the paths of vehicleA and vehicleB into vehicleA, such that nodeA and nodeB are adjacent, and remove vehicleB
-            if (totalCapacity <= vehicleCapacity){
+            if (totalCapacity <= vehicleCapacity && vehicleA != vehicleB){
                 vector<node> routeA = vehicleA->route;
                 vector<node> routeB = vehicleB->route;
                 // Remove savings containing nodeA and nodeB if they are no longer the first or last node of their
-                // respective vehicle, i.e. if their current vehicle's route does not contain only them
+                // respective vehicle, i.e. if their current vehicle's route does not contain only them, and remove
+                // the current saving
+                savings.erase(savings.begin() + s, savings.begin() + s + 1);
                 if (routeA.size() > 2){
-                    remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeA); });
+                    auto newEnd = remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeA); });
+                    savings.erase(newEnd, savings.end());
                 }
                 if (routeB.size() > 2){
-                    remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeB); });
+                    auto newEnd = remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeB); });
+                    savings.erase(newEnd, savings.end());
                 }
                 // From this point onwards, previously defined references to elements of 'savings' are invalid.
                 // Set routeA so that the depot is at the front and nodeA is at the end
@@ -55,7 +60,7 @@ solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving>
                 }
                 // Combine the two routes such that nodeA and nodeB are adjacent, merge the result into vehicle A, and erase vehicle B
                 routeA.insert(routeA.end(), routeB.begin(), routeB.end());
-                routeA.swap(vehicleA->route);
+                vehicleA->route = routeA;
                 result.vehicles.erase(vehicleB, vehicleB + 1);
                 // Start back from the top of the loop
                 nodesMatched = true;

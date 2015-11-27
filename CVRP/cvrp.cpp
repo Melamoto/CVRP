@@ -49,9 +49,6 @@ int32_t cvrp::sqrDistance(node a, node b){
 }
 
 double cvrp::distance(node a, node b){
-    if (a.num == 213 && b.num == 229){
-        cout << "Oh dear." << '\n';
-    }
     double result = sqrt(sqrDistance(a,b));
     return sqrt(sqrDistance(a,b));
 }
