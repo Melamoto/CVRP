@@ -27,7 +27,7 @@ vector<saving> calculateSavings(const vector<node> nodes){
     for (size_t i = 1; i < nodes.size() - 1; i++){
         for (size_t j = i + 1; j < nodes.size(); j++){
             saving ijSaving(nodes[0], nodes[i], nodes[j]);
-            auto pos = lower_bound(savings.begin(), savings.end(), ijSaving);
+            vector<saving>::iterator pos = lower_bound(savings.begin(), savings.end(), ijSaving);
             savings.insert(pos, ijSaving);
         }
     }

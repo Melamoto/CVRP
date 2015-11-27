@@ -18,7 +18,6 @@ int main(int argc, char** argv){
         return 0;
     }
     string filename(argv[1]);
-    double mutationRate = 0.1;
     problemParameters problem = getParameters(filename);
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     rng = default_random_engine(seed);
