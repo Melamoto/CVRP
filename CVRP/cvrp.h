@@ -19,9 +19,11 @@ namespace cvrp{
         uint16_t demand;
     };
 
-    int32_t sqrDistance(node a, node b);
-
+    uint32_t sqrDistance(node a, node b);
     double distance(node a, node b);
+
+    uint64_t sqrCost(vector<node> nodes);
+    double cost(vector<node> nodes);
 
     class vehicle{
     public:
@@ -33,20 +35,10 @@ namespace cvrp{
         vector<node> getRoute();
         // Returns true if this vehicle's route contains the given node
         bool containsNode(uint16_t nodeNum) const;
-        // Adds a node to the route
-        void addNode(node newNode);
-        // As above, for multiple nodes
-        void addNodes(vector<node> newNodes);
-        // Removes a node from the route; returns true if the route contains any nodes other than the start after removal
-        bool removeNode(uint16_t nodeNum);
-        // As above, for multiple nodes
-        bool removeNodes(vector<uint16_t> nodeNums);
         // Returns the total cost of the vehicle's route
         double getRouteCost();
         // Returns a string of the route in the form "a->b->c->...->a"
         string getRouteString();
-        // Uses nearest-neighbour to optimise the TSP problem
-        void optimiseRoute();
         vector<node> route;
     private:
         double routeCost;
@@ -55,9 +47,11 @@ namespace cvrp{
     class solution{
     public:
         double getCost();
+        double getInfeasibleCost(uint16_t vehicleCapacity, double scaling);
         vector<vehicle>::iterator containingVehicle(uint16_t nodeNum);
         vector<vehicle> vehicles;
         void printSolution(ostream& out);
+        bool isFeasible(size_t nodeCount, int16_t vehicleCapacity);
     };
 
     struct problemParameters{

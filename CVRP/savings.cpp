@@ -40,7 +40,7 @@ solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving>
     solution result;
     for (size_t i = 1; i < nodes.size(); i++){
         result.vehicles.emplace_back(nodes[0]);
-        result.vehicles.back().addNode(nodes[i]);
+        result.vehicles.back().route.insert(result.vehicles.back().route.end(), nodes[i]);
     }
     bool nodesMatched = true;
     // At the end of each loop:

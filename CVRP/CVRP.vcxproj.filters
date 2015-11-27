@@ -24,6 +24,9 @@
     <ClInclude Include="savings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tabu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cvrp.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cvrpSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tabu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,100 +7,32 @@ using namespace cvrp;
 
 // Returns the total used capacity of this vehicle
 uint16_t vehicle::usedCapacity(){
-  uint16_t totalCapacity = 0;
-  for (auto n : route) totalCapacity += n.demand;
-  return totalCapacity;
+    uint16_t totalCapacity = 0;
+    for (auto n : route) totalCapacity += n.demand;
+    return totalCapacity;
 }
 // Returns a copy of this vehicle's route
 vector<node> vehicle::getRoute(){
-  return route;
-
+    return route;
 }
 // Returns true if this vehicle's route contains the given node
 bool vehicle::containsNode(uint16_t nodeNum) const{
-  auto nPos = find_if(route.begin(), route.end(), [&](const node& n) { return n.num == nodeNum; });
-  return nPos != route.end();
-}
-// Adds a node to the route
-void vehicle::addNode(node newNode){
-  route.push_back(newNode);
-}
-// As above, for multiple nodes
-void vehicle::addNodes(vector<node> newNodes){
-  route.insert(route.end(), newNodes.begin(), newNodes.end());
-}
-// Removes a node from the route; returns true if the route contains any nodes other than the start after removal
-bool vehicle::removeNode(uint16_t nodeNum){
-  auto nPos = find_if(route.begin(), route.end(), [&](const node& n) { return n.num == nodeNum; });
-  if (nPos != route.end()){
-      node swap = *nPos;
-      *nPos = route.back();
-      route.back() = swap;
-      route.erase(route.end()-1, route.end());
-  }
-  return route.size() > 1;
-}
-// As above, for multiple nodes
-bool vehicle::removeNodes(vector<uint16_t> nodeNums){
-  int removeCount = 0;
-  for (auto nodeNum : nodeNums){
-      auto nPos = find_if(route.begin(), route.end(), [&](const node& n) { return n.num == nodeNum; });
-      if (nPos != route.end()){
-          node swap = *nPos;
-          *nPos = route[route.size()-1-removeCount];
-          route[route.size()-1-removeCount] = swap;
-          removeCount++;
-      }
-    }
-  if (removeCount > 0){
-      route.erase(route.end() - removeCount, route.end());
-  }
-  return route.size() > 1;
+    auto nPos = find_if(route.begin(), route.end(), [&](const node& n) { return n.num == nodeNum; });
+    return nPos != route.end();
 }
 // Returns the total cost of the vehicle's route
 double vehicle::getRouteCost(){
-  double totalDistance = 0;
-  for (size_t i = 0; i < route.size() - 1; i++){
-      totalDistance += distance(route[i], route[i+1]);
-  }
-  totalDistance += distance(route[0], route.back());
-  return totalDistance;
+    return cost(route);
 }
 // Returns a string of the route in the form "a->b->c->...->a"
 string vehicle::getRouteString(){
-  string output;
-  for (auto n : route){
-      output += to_string(n.num);
-      output += "->";
-  }
-  output += to_string(route[0].num);
-  return output;
-}
-// Uses nearest-neighbour to optimise the TSP problem
-void vehicle::optimiseRoute(){
-  routeCost = 0;
-  for (size_t i = 0; i < route.size() - 1; ++i){
-      // Find the node with index > i with the minimum distance to i
-      int16_t minSqrDistance = sqrDistance(route[i], route[i+1]);
-      size_t minNode = i+1;
-      for (size_t j = i + 2; j < route.size(); j++){
-          int16_t jSqrDistance = sqrDistance(route[i], route[j]);
-          if (jSqrDistance < minSqrDistance){
-              minNode = j;
-              minSqrDistance = jSqrDistance;
-          }
-      }
-      // Swap the closest node to i so that it is in position i+1
-      if (minNode != i + 1){
-          node swap = route[i + 1];
-          route[i + 1] = route[minNode];
-          route[minNode] = swap;
-      }
-      // Add the distance of the nodes to the route total distance
-      routeCost += sqrt(minSqrDistance);
-  }
-  // Add the distance to complete the circuit
-  routeCost += distance(route[0], route.back());
+    string output;
+    for (auto n : route){
+        output += to_string(n.num);
+        output += "->";
+    }
+    output += to_string(route[0].num);
+    return output;
 }
 
 
@@ -108,6 +40,15 @@ double solution::getCost(){
     double totalCost = 0;
     for (auto v : vehicles){
         totalCost += v.getRouteCost();
+    }
+    return totalCost;
+}
+double solution::getInfeasibleCost(uint16_t vehicleCapacity, double scaling){
+    double totalCost = 0;
+    for (auto v : vehicles){
+        totalCost += v.getRouteCost();
+        int16_t overCapacity = v.usedCapacity() - vehicleCapacity;
+        if (overCapacity > 0) totalCost += overCapacity;
     }
     return totalCost;
 }
@@ -125,6 +66,25 @@ void solution::printSolution(ostream& out){
         out << '\n' << v.getRouteString();
     }
     out << endl;
+}
+// Checks that each node is included in exactly 1 vehicle route, and no vehicle is over-capacity
+bool solution::isFeasible(size_t nodeCount, int16_t vehicleCapacity){
+    vector<bool> nodeFound(nodeCount,false);
+    // Depot should not be in any vehicle route except as the first node
+    nodeFound[0] = true;
+    for (auto v : vehicles){
+        // Check that vehicles are not over-capacity
+        if (v.usedCapacity() > vehicleCapacity) return false;
+        // Check that the first node on the vehicle's route is the depot
+        if (v.route[0].num != 1) return false;
+        // Check that no node in the vehicle's route is duplicated anywhere
+        for (size_t i = 1; i < v.route.size(); i++){
+            size_t nodeIndex = v.route[i].num - 1;
+            if (nodeFound[nodeIndex]) return false;
+            nodeFound[nodeIndex] = true;
+        }
+    }
+    return true;
 }
 
 problemParameters cvrp::getParameters(string filename){
@@ -165,7 +125,7 @@ problemParameters cvrp::getParameters(string filename){
     return problem;
 }
 
-int32_t cvrp::sqrDistance(node a, node b){
+uint32_t cvrp::sqrDistance(node a, node b){
     int16_t distX = a.x - b.x;
     int16_t distY = a.y - b.y;
     return (distX*distX) + (distY*distY);
@@ -173,4 +133,22 @@ int32_t cvrp::sqrDistance(node a, node b){
 
 double cvrp::distance(node a, node b){
     return sqrt(sqrDistance(a,b));
+}
+
+
+uint64_t cvrp::sqrCost(vector<node> nodes){
+    uint64_t totalCost = 0;
+    for (size_t i = 0; i < nodes.size() - 1; i++){
+        totalCost += sqrDistance(nodes[i], nodes[i+1]);
+    }
+    totalCost += sqrDistance(nodes[0], nodes.back());
+    return totalCost;
+}
+double cvrp::cost(vector<node> nodes){
+    double totalCost = 0;
+    for (size_t i = 0; i < nodes.size() - 1; i++){
+        totalCost += distance(nodes[i], nodes[i+1]);
+    }
+    totalCost += distance(nodes[0], nodes.back());
+    return totalCost;
 }

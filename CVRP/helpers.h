@@ -26,3 +26,33 @@ inline typename vector<T>::iterator randomElement(vector<T>& vec, default_random
     vector<T>::iterator eltIt = vec.begin() + eltSelect(rng);
     return eltIt;
 }
+
+bool cycleAdjacent(size_t vecSize, size_t i, size_t j){
+    size_t min;
+    size_t max;
+    if (i < j){
+        min = i;
+        max = j;
+    }
+    else if (j < i){
+        min = j;
+        max = i;
+    }
+    else return false;
+    if (min + 1 == max) return true;
+    if (min == 0 && max == vecSize - 1) return true;
+    return false;
+}
+
+inline size_t cycleNext(size_t vecSize, size_t i){
+    return i + 1 % vecSize;
+}
+inline size_t cyclePrev(size_t vecSize, size_t i){
+    return i == 0 ? vecSize - 1 : i - 1;
+}
+
+bool cycleBetween(size_t vecSize, size_t elt, size_t first, size_t last){
+    size_t next = elt;
+    while (next != first && next != last) next = cycleNext(vecSize, next);
+    return next == last;
+}
