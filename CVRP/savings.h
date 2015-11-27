@@ -26,4 +26,7 @@ inline bool operator>=(const saving& lhs, const saving& rhs){ return !(lhs < rhs
 // Discounts the first node as the depot
 vector<saving> calculateSavings(const vector<node> nodes);
 
+// Given the set of nodes (with the first node being the depot) and their corresponding savings,
+// returns the heuristic solution given by the Clarke-Wright algorithm
+solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving> savings, uint16_t vehicleCapacity);
 

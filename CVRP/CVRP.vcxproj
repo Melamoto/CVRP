@@ -67,13 +67,11 @@
     <ClInclude Include="cvrp.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="savings.h" />
-    <ClInclude Include="tabu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cvrp.cpp" />
     <ClCompile Include="cvrpSolver.cpp" />
     <ClCompile Include="savings.cpp" />
-    <ClCompile Include="tabu.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

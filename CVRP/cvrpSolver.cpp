@@ -6,7 +6,7 @@
 #include <chrono>
 #include <stdexcept>
 #include "cvrp.h"
-#include "tabu.h"
+#include "savings.h"
 
 using namespace cvrp;
 
@@ -19,7 +19,7 @@ int main(int argc, char** argv){
     }
     string filename(argv[1]);
     problemParameters problem = getParameters(filename);
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    unsigned seed = static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count());
     rng = default_random_engine(seed);
     vector<saving> savings = calculateSavings(problem.nodes);
     solution solution = calculateClarkeWrightSolution(problem.nodes, savings, problem.capacity);
