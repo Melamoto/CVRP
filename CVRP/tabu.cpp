@@ -34,7 +34,7 @@ solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving>
                 // Remove savings containing nodeA and nodeB if they are no longer the first or last node of their
                 // respective vehicle, i.e. if their current vehicle's route does not contain only them, and remove
                 // the current saving
-                savings.erase(savings.begin() + s, savings.begin() + s + 1);
+                savings.erase(savings.begin() + s);
                 if (routeA.size() > 2){
                     auto newEnd = remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeA); });
                     savings.erase(newEnd, savings.end());
@@ -43,7 +43,7 @@ solution calculateClarkeWrightSolution(const vector<node>& nodes, vector<saving>
                     auto newEnd = remove_if(savings.begin(), savings.end(), [&](const saving& sav) { return sav.contains(nodeB); });
                     savings.erase(newEnd, savings.end());
                 }
-                // From this point onwards, previously defined references to elements of 'savings' are invalid.
+                // WARNING: From this point onwards, previously defined references to elements of 'savings' are invalid.
                 // Set routeA so that the depot is at the front and nodeA is at the end
                 if (routeA.back().num != nodeA){
                     reverse(routeA.begin()+1, routeA.end());
