@@ -69,6 +69,13 @@ namespace tsp{
         return problem;
     }
 
+    size_t optimalPopulationSize(size_t cities, double prob)
+    {
+        double inverseCities = 1 / cities;
+        size_t size = ceil(log(1 - pow(prob,inverseCities))/(log(cities-3/cities-1)));
+        return size;
+    }
+
     vector<chromosome> initialPopulation(shared_ptr<problemParameters>& problem, int populationSize, default_random_engine& rng)
     {
         vector<chromosome> population;

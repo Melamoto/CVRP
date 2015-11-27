@@ -64,12 +64,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cvrp.cpp" />
+    <ClCompile Include="cvrpSolver.cpp" />
     <ClCompile Include="genetic.cpp" />
+    <ClCompile Include="savings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chromosome.h" />
     <ClInclude Include="cvrp.h" />
     <ClInclude Include="helpers.h" />
+    <ClInclude Include="savings.h" />
+    <ClInclude Include="sweep.h" />
+    <ClInclude Include="tabu.h" />
     <ClInclude Include="tsp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -27,9 +27,27 @@
     <ClInclude Include="helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sweep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="savings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tabu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="genetic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="savings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cvrpSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cvrp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
